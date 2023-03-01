@@ -4,13 +4,13 @@ namespace Cblink\Service\FormSchema;
 use Hyperf\Utils\Contracts\Arrayable;
 
 /**
- * @method $this setLabel(string $label)
- * @method $this setComponent(string $component)
- * @method $this setType(string $type)
- * @method $this setDefault($default)
- * @method $this setRules(array $rules)
- * @method $this setSort(int $sort)
- * @method $this setExt(array $ext)
+ * @method $this label(string $label)
+ * @method $this component(string $component)
+ * @method $this type(string $type)
+ * @method $this default($default)
+ * @method $this rules(array $rules)
+ * @method $this sort(int $sort)
+ * @method $this ext(array $ext)
  */
 class Field implements Arrayable
 {
@@ -43,21 +43,15 @@ class Field implements Arrayable
      */
     public function __call($name, $arguments)
     {
-        if (! str_starts_with($name, 'set')) {
-            throw new \InvalidArgumentException(sprintf('method %s not found!', $name));
-        }
-
         if (count($arguments) < 1) {
             throw new \InvalidArgumentException(sprintf('%s At least 1 parameter!', $name));
         }
 
-        $key = strtolower(substr($name, 3));
-
-        if (! in_array($key, ['label', 'component', 'type', 'default', 'rules', 'sort', 'ext'])) {
+        if (! in_array($name, ['label', 'component', 'type', 'default', 'rules', 'sort', 'ext'])) {
             throw new \InvalidArgumentException(sprintf('%s At least 1 parameter!', $name));
         }
 
-        $this->payload[$key] = $arguments[0];
+        $this->payload[$name] = $arguments[0];
 
         return $this;
     }

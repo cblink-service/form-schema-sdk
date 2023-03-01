@@ -11,7 +11,28 @@ $ composer require cblink-service/form-schema-sdk -vvv
 
 ## Usage
 
-TODO
+```php
+
+use Cblink\Service\FormSchema\Table;
+use Cblink\Service\FormSchema\Schema;
+
+$config = [
+    'appid' => 'xxx',
+    'secret' => 'xxxx',
+    // base_url ...
+];
+
+$schema = new Schema($config);
+
+$schema->create('category', function (Table $table) {
+    $table->comment('分类');
+    $table->field('name')->label('分类名称')->rules(['required', 'string'])
+    $table->field('sort')->label('权重')->default(999);
+    // 不需要添加created_at 与 updated_at
+    // ...
+});
+
+```
 
 ## Contributing
 
