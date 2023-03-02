@@ -17,31 +17,6 @@ class Schema
     }
 
     /**
-     * 创建表单
-     *
-     * @param $code
-     * @param Closure $closure
-     * @return array
-     * @throws GuzzleException
-     */
-    public function create($code, Closure $closure)
-    {
-        $table = new Table($code);
-
-        call_user_func($closure, $table);
-
-        $data = $table->toArray();
-
-        $form = $this->format($this->app->form->store($data['table']));
-
-        $fields = array_map(function (Field $field) use ($form){
-            return $this->format($this->app->field->store($form['code'], $field->toArray()));
-        },$data['fields']);
-
-        return [$form, $fields];
-    }
-
-    /**
      * 更新表单
      *
      * @param $code
@@ -55,21 +30,99 @@ class Schema
 
         call_user_func($closure, $table);
 
-        $data = $table->toArray();
+        return $this->dispatch($table);
+    }
 
-        $form = $this->format($this->app->form->show($code));
 
-        $existsFields = Arr::pluck($this->format($this->app->field->index($code)), 'field');
+    /**
+     * @param Table $table
+     * @return array
+     * @throws GuzzleException
+     */
+    protected function dispatch(Table $table)
+    {
+        // 查询表是否存在
+        $form = $this->verify($this->app->form->show($table->getCode()));
 
-        return array_map(function (Field $field) use ($form, $existsFields){
+        if (!$form) {
+            $form = $this->response($this->app->form->store($table->getTable()));
+        }
 
-            // 如果字段存在，则进行修改，否则进行创建
-            $result = in_array($field->field(), $existsFields) ?
-                $this->app->field->updateByField($form['code'], $field->field(), $field->toArray()) :
-                $this->app->field->store($form['code'], $field->toArray());
+        $existsFields = Arr::pluck($this->response($this->app->field->index($table->getCode())),'id', 'field');
+        $fields = [];
 
-            return $this->format($result, false);
-        },$data['fields']);
+        /* @var Field $field */
+        foreach ($table->getFields() as $field) {
+            // 返回值
+            $result = ['field' => $field->field(), 'payload' => $field->toArray()];
+            // 删除搜索
+            if ($field->isDrop() && array_key_exists($field->field(), $existsFields)) {
+                $result['response'] = $this->app->field->destroy($table->getCode(), $existsFields[$field->field()]);
+                $fields[] = $result;
+                continue;
+            }
+
+            // 更新字段
+            if (array_key_exists($field->field(), $existsFields)) {
+                $result['response'] = $this->app->field->update($table->getCode(), $existsFields[$field->field()], $field->toArray());
+                $fields[] = $result;
+                continue;
+            }
+
+            // 创建搜索项
+            $result['response'] = $this->app->field->store($table->getCode(), $field->toArray());
+            $fields[] = $result;
+        }
+
+        $existsSearch = Arr::pluck($this->response($this->app->search->index($table->getCode())), 'id', 'field');
+
+        $searchable = [];
+
+        /* @var Searchable $search */
+        foreach ($table->getSearchable() as $search) {
+            // 返回值
+            $result = ['field' => $search->field(), 'payload' => $search->toArray()];
+            // 删除搜索
+            if ($search->isDrop() && array_key_exists($search->field(), $existsSearch)) {
+                $result['response'] = $this->app->search->destroy($table->getCode(), $existsSearch[$search->field()]);
+                $searchable[] = $result;
+                continue;
+            }
+            // 创建搜索项
+            $result['response'] = $this->app->search->store($table->getCode(), $search->toArray());
+            $searchable[] = $result;
+        }
+
+
+        return [
+            'form' => $form,
+            'fields' => $fields,
+            'searchable' => $searchable,
+        ];
+    }
+
+
+    /**
+     * @param $code
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function exists($code)
+    {
+        $response = $this->app->form->show($code);
+
+        return $response['err_code'] == 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function verify($data)
+    {
+        if (isset($data['err_code']) && is_int($data['err_code']) && $data['err_code'] == 0) {
+            return $data['data'];
+        }
+        return false;
     }
 
     /**
@@ -77,7 +130,7 @@ class Schema
      * @param bool $throw
      * @return mixed
      */
-    public function format($data, bool $throw = true)
+    protected function response($data, bool $throw = true)
     {
         // 请求成功了则返回
         if (isset($data['err_code']) && is_int($data['err_code']) && $data['err_code'] == 0) {

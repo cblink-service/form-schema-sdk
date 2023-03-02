@@ -24,7 +24,7 @@ $config = [
 
 $schema = new Schema($config);
 
-$schema->create('category', function (Table $table) {
+$schema->table('category', function (Table $table) {
     $table->comment('分类');
     $table->field('name')->label('分类名称')->rules(['required', 'string'])
     $table->field('sort')->label('权重')->default(999);

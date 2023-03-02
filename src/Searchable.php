@@ -1,32 +1,29 @@
 <?php
 
 namespace Cblink\Service\FormSchema;
+
+use Cblink\Service\FormSchema\Consts\FormSearchConst;
 use Hyperf\Utils\Contracts\Arrayable;
 
 /**
  * @method $this label(string $label)
- * @method $this component(string $component)
- * @method $this type(string $type)
- * @method $this default($default)
- * @method $this rules(array $rules)
  * @method $this sort(int $sort)
- * @method $this ext(array $ext)
+ * @method $this group(string $group = 'default')
  */
-class Field implements Arrayable
+class Searchable implements Arrayable
 {
+
     /**
-     * @var array
+     * @var
      */
-    protected $payload = [
-        'sort' => 999,
-    ];
+    protected $payload = [];
 
     /**
      * @var array
      */
     protected $drop = false;
 
-    public function __construct($field)
+    public function __construct(string $field)
     {
         $this->payload['field'] = $field;
     }
@@ -53,6 +50,16 @@ class Field implements Arrayable
     }
 
     /**
+     * @param string $type
+     * @return $this
+     */
+    public function type(string $type = FormSearchConst::TYPE_EQ)
+    {
+        $this->payload['type'] = $type;
+        return $this;
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return $this
@@ -63,7 +70,7 @@ class Field implements Arrayable
             throw new \InvalidArgumentException(sprintf('%s At least 1 parameter!', $name));
         }
 
-        if (! in_array($name, ['label', 'component', 'type', 'default', 'rules', 'sort', 'ext'])) {
+        if (! in_array($name, ['label', 'sort', 'group'])) {
             throw new \InvalidArgumentException(sprintf('%s method not found!', $name));
         }
 
@@ -73,7 +80,7 @@ class Field implements Arrayable
     }
 
     /**
-     * @return array|int[]
+     * @return array
      */
     public function toArray(): array
     {

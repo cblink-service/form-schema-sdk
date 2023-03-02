@@ -4,7 +4,7 @@ namespace Cblink\Service\FormSchema;
 
 use Hyperf\Utils\Contracts\Arrayable;
 
-class Table implements Arrayable
+class Table
 {
     /**
      * @var string
@@ -16,6 +16,7 @@ class Table implements Arrayable
      */
     protected $name;
 
+    protected $search = [];
     /**
      * @var array
      */
@@ -49,16 +50,36 @@ class Table implements Arrayable
     }
 
     /**
-     * @return array
+     * @param $field
+     * @return Searchable
      */
-    public function toArray(): array
+    public function searchable($field)
+    {
+        $this->search[$field] = new Searchable($field);
+
+        return $this->search[$field];
+    }
+
+    public function getTable()
     {
         return [
-            'table' => [
-                'code' => $this->code,
-                'name' => $this->name,
-            ],
-            'fields' => $this->fields,
+            'code' => $this->code,
+            'name' => $this->name,
         ];
+    }
+
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    public function getSearchable()
+    {
+        return $this->search;
     }
 }
