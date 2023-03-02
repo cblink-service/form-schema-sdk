@@ -16,7 +16,10 @@ class Searchable implements Arrayable
     /**
      * @var
      */
-    protected $payload = [];
+    protected $payload = [
+        'sort' =>  999,
+        'type' => FormSearchConst::TYPE_EQ,
+    ];
 
     /**
      * @var array

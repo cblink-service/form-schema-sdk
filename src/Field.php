@@ -19,6 +19,7 @@ class Field implements Arrayable
      */
     protected $payload = [
         'sort' => 999,
+        'type' => FormFieldConst::TYPE_TRADE,
     ];
 
     /**
