@@ -33,6 +33,22 @@ class Schema
         return $this->dispatch($table);
     }
 
+    /**
+     * @param $code
+     * @return array|false|\Psr\Http\Message\ResponseInterface|string
+     * @throws GuzzleException
+     */
+    public function drop($code)
+    {
+        // 查询表是否存在
+        $form = $this->verify($this->app->form->show($code));
+
+        if ($form) {
+            return $this->app->form->destroy($code);
+        }
+
+        return false;
+    }
 
     /**
      * @param Table $table
