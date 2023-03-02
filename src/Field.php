@@ -1,12 +1,12 @@
 <?php
 
 namespace Cblink\Service\FormSchema;
+use Cblink\Service\FormSchema\Consts\FormFieldConst;
 use Hyperf\Utils\Contracts\Arrayable;
 
 /**
  * @method $this label(string $label)
  * @method $this component(string $component)
- * @method $this type(string $type)
  * @method $this default($default)
  * @method $this rules(array $rules)
  * @method $this sort(int $sort)
@@ -40,6 +40,16 @@ class Field implements Arrayable
     }
 
     /**
+     * @param string $type
+     * @return $this
+     */
+    public function type(string $type = FormFieldConst::TYPE_TRADE)
+    {
+        $this->payload['type'] = $type;
+        return $this;
+    }
+
+    /**
      * @return void
      */
     public function drop()
@@ -63,7 +73,7 @@ class Field implements Arrayable
             throw new \InvalidArgumentException(sprintf('%s At least 1 parameter!', $name));
         }
 
-        if (! in_array($name, ['label', 'component', 'type', 'default', 'rules', 'sort', 'ext'])) {
+        if (! in_array($name, ['label', 'component', 'default', 'rules', 'sort', 'ext'])) {
             throw new \InvalidArgumentException(sprintf('%s method not found!', $name));
         }
 
