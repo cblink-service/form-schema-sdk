@@ -15,6 +15,7 @@ $ composer require cblink-service/form-schema-sdk -vvv
 
 use Cblink\Service\FormSchema\Table;
 use Cblink\Service\FormSchema\Schema;
+use Cblink\Service\FormSchema\Consts\FormSearchConst;
 
 $config = [
     'appid' => 'xxx',
@@ -28,6 +29,8 @@ $schema->table('category', function (Table $table) {
     $table->comment('分类');
     $table->field('name')->label('分类名称')->rules(['required', 'string'])
     $table->field('sort')->label('权重')->default(999);
+    
+    $table->searchable('sort')->type(FormSearchConst::TYPE_EQ);
     // 不需要添加created_at 与 updated_at
     // ...
 });
