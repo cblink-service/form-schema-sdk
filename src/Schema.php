@@ -71,16 +71,19 @@ class Schema
         foreach ($table->getFields() as $field) {
             // 返回值
             $result = ['field' => $field->field(), 'payload' => $field->toArray()];
+
+            $exists = array_key_exists($field->field(), $existsFields) || in_array($field->id(), $existsFields);
+
             // 删除搜索
-            if ($field->isDrop() && array_key_exists($field->field(), $existsFields)) {
-                $result['response'] = $this->app->field->destroy($table->getCode(), $existsFields[$field->field()]);
+            if ($field->isDrop() && $exists) {
+                $result['response'] = $this->app->field->destroy($table->getCode(), ($field->id() ?: $existsFields[$field->field()]));
                 $fields[] = $result;
                 continue;
             }
 
             // 更新字段
-            if (array_key_exists($field->field(), $existsFields)) {
-                $result['response'] = $this->app->field->update($table->getCode(), $existsFields[$field->field()], $field->toArray());
+            if ($exists) {
+                $result['response'] = $this->app->field->update($table->getCode(), ($field->id() ?: $existsFields[$field->field()]), $field->toArray());
                 $fields[] = $result;
                 continue;
             }

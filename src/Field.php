@@ -28,9 +28,15 @@ class Field implements Arrayable
      */
     protected $drop = false;
 
-    public function __construct($field)
+    /**
+     * @var mixed|string
+     */
+    protected $type;
+
+    public function __construct($field, $updateBy = 'field')
     {
-        $this->payload['field'] = $field;
+        $this->type = $updateBy;
+        $this->payload[$this->isById() ? 'id': 'field'] = $field;
     }
 
     /**
@@ -38,7 +44,12 @@ class Field implements Arrayable
      */
     public function field()
     {
-        return $this->payload['field'];
+        return $this->payload['field'] ?? null;
+    }
+
+    public function id()
+    {
+        return $this->payload['id'] ?? null;
     }
 
     /**
@@ -62,6 +73,14 @@ class Field implements Arrayable
     public function isDrop()
     {
         return $this->drop;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isById()
+    {
+        return $this->type == 'id';
     }
 
     /**
