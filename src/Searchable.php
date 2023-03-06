@@ -42,9 +42,9 @@ class Searchable implements Arrayable
     /**
      * @return void
      */
-    public function drop()
+    public function dropIf(bool $where = true)
     {
-        $this->drop = true;
+        $this->drop = $where;
     }
 
     public function isDrop()

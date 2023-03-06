@@ -11,6 +11,7 @@ use Hyperf\Utils\Contracts\Arrayable;
  * @method $this rules(array $rules)
  * @method $this sort(int $sort)
  * @method $this ext(array $ext)
+ * @method $this data(array $data)
  */
 class Field implements Arrayable
 {
@@ -53,9 +54,9 @@ class Field implements Arrayable
     /**
      * @return void
      */
-    public function drop()
+    public function dropIf(bool $where = true)
     {
-        $this->drop = true;
+        $this->drop = $where;
     }
 
     public function isDrop()
@@ -74,7 +75,7 @@ class Field implements Arrayable
             throw new \InvalidArgumentException(sprintf('%s At least 1 parameter!', $name));
         }
 
-        if (! in_array($name, ['label', 'component', 'default', 'rules', 'sort', 'ext'])) {
+        if (! in_array($name, ['label', 'component', 'default', 'rules', 'sort', 'ext', 'data'])) {
             throw new \InvalidArgumentException(sprintf('%s method not found!', $name));
         }
 
