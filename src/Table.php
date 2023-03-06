@@ -45,9 +45,7 @@ class Table
      */
     public function field($field, string $updateBy = 'field')
     {
-        $this->fields[$field] = new Field($field, $updateBy);
-
-        return $this->fields[$field];
+        return $this->fields[] = new Field($field, $updateBy);
     }
 
     /**
@@ -56,9 +54,7 @@ class Table
      */
     public function searchable($field)
     {
-        $this->search[$field] = new Searchable($field);
-
-        return $this->search[$field];
+        return $this->search[] = new Searchable($field);
     }
 
     public function getTable()
