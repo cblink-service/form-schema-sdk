@@ -40,11 +40,12 @@ class Table
      * 设置字段
      *
      * @param $field
+     * @param string $updateBy
      * @return Field
      */
-    public function field($field)
+    public function field($field, string $updateBy = 'field')
     {
-        $this->fields[$field] = new Field($field);
+        $this->fields[$field] = new Field($field, $updateBy);
 
         return $this->fields[$field];
     }
