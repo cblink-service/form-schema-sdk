@@ -64,7 +64,7 @@ class Schema
             $form = $this->response($this->app->form->store($table->getTable()));
         }
 
-        $existsFields = Arr::pluck($this->response($this->app->field->index($table->getCode())),'id', 'field');
+        $existsFields = Arr::pluck($this->response($this->app->field->index($table->getCode())),'field', 'id');
         $fields = [];
 
         /* @var Field $field */
@@ -72,7 +72,7 @@ class Schema
             // 返回值
             $result = ['payload' => $field->toArray()];
 
-            $exists = array_key_exists($field->field(), $existsFields) || in_array($field->id(), $existsFields);
+            $exists = ($field->field() && in_array($field->field(), $existsFields)) || ($field->id() && array_key_exists($field->id(), $existsFields));
 
             // 删除搜索
             if ($field->isDrop() && $exists) {
