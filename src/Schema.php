@@ -70,13 +70,14 @@ class Schema
         /* @var Field $field */
         foreach ($table->getFields() as $field) {
             // 返回值
-            $result = ['field' => $field->field(), 'payload' => $field->toArray()];
+            $result = ['payload' => $field->toArray()];
 
             $exists = array_key_exists($field->field(), $existsFields) || in_array($field->id(), $existsFields);
 
             // 删除搜索
             if ($field->isDrop() && $exists) {
                 $result['response'] = $this->app->field->destroy($table->getCode(), ($field->id() ?: $existsFields[$field->field()]));
+                $result['type'] = 'delete';
                 $fields[] = $result;
                 continue;
             }
@@ -84,11 +85,13 @@ class Schema
             // 更新字段
             if ($exists) {
                 $result['response'] = $this->app->field->update($table->getCode(), ($field->id() ?: $existsFields[$field->field()]), $field->toArray());
+                $result['type'] = 'updated';
                 $fields[] = $result;
                 continue;
             }
 
             // 创建搜索项
+            $result['type'] = 'created';
             $result['response'] = $this->app->field->store($table->getCode(), $field->toArray());
             $fields[] = $result;
         }
